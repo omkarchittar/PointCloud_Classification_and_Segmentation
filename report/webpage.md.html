@@ -1,0 +1,177 @@
+<meta charset="utf-8" emacsmode="-*- markdown -*">
+**CMSC848F Assignment 4: Point Cloud Classification and Segmentation**
+
+Name: Omkar Chittar 
+
+UID: 119193556
+
+
+Classification Model
+===============================================================================
+I implemented the PointNet architecture.
+
+Run:  
+```bash
+python train.py --task cls
+``` 
+for training the classification model.
+
+Run:  
+```bash
+python eval_cls.py
+``` 
+for evaluating the trained model.
+
+The test accuracy of the model is stored as **`best_model.pt`** in the **`./checkpoints/cls`** folder and has a value **0.9769**
+
+## Results
+
+### Correct Classifications
+
+
+| Point Cloud|      |                  | Ground truth Class | Predicted Class |
+|:-----------|------------|:----------:|--------------------|-----------------|
+| ![](1.gif) | ![](2.gif) | ![](3.gif) | Chair              | Chair           |
+| ![](4.gif) | ![](5.gif) | ![](6.gif) | Vase               | Vase            |
+| ![](7.gif) | ![](8.gif) | ![](9.gif) | Lamp               | Lamp            |
+
+
+### Incorrect Classifications
+
+
+| Point Cloud | Ground Truth Class | Predicted Class |
+|:-----------:|:------------------:|:---------------:|
+| ![](10.gif) | Chair | Lamp |
+| ![](11.gif) | Vase | Lamp |
+| ![](12.gif) | Lamp | Vase |
+
+Analysis
+-------------------------------------------------------------------------------
+
+The misclassifications made by the PointNet model on the few failure cases seem to be due to those examples deviating significantly from the norm for their respective categories. For instance, the misclassified chair examples have unusual or atypical designs - one is folded up and missing a seat, while the other is unusually tall. Similarly, some of the misclassified vases and lamps have shapes that overlap more with the opposing class. 
+Additionally, the chair class appears to have less shape variety overall compared to vases and lamps. Chairs components tend to be more standardized (seat, legs, back, etc). In contrast, the vase and lamp categories exhibit greater diversity in proportions and silhouettes (floor lamps vs desk lamps, vases with or without flowers etc). The model's confusion between these two classes likely stems from their greater morphological similarity in many cases - symmetry about the vertical axis, cylindrical profiles etc.
+
+
+Segmentation Model
+===============================================================================
+I implemented the PointNet architecture.
+
+Run:  
+```bash
+python train.py --task seg
+``` 
+for training the segmentation model.
+
+Run:  
+```bash
+python eval_seg.py
+``` 
+for evaluating the trained model.
+
+The test accuracy of the model is stored as **`best_model.pt`** in the **`./checkpoints/seg`** folder and has a value **0.9022**
+
+
+## Results
+
+### Good Predictions
+
+| Ground truth point cloud | Predicted point cloud | Accuracy |
+|:------------------:|:---------------:|:--------------------:|
+| ![](13.gif)        | ![](14.gif)     | 0.9836 |
+| ![](15.gif)        | ![](16.gif)     | 0.9237 |
+| ![](17.gif)        | ![](18.gif)     | 0.917 |
+
+### Bad Predictions
+
+| Ground truth point cloud | Predicted point cloud | Accuracy |
+|:------------------:|:---------------:|:--------------------:|
+| ![](19.gif)        | ![](20.gif)     | 0.5171 |
+| ![](21.gif)        | ![](22.gif)     | 0.4776 |
+| ![](23.gif)        | ![](24.gif)     | 0.5126 |
+
+Analysis:
+-------------------------------------------------------------------------------
+
+The model struggles to accurately segment sofa-like chairs where the boundaries between components like the back, headrest, armrests, seat and legs are less defined. The blending of these parts without clear delineation poses a challenge. Similarly, chairs with highly irregular or atypical shapes and geometries also confuse the model as they deviate significantly from the distribution of point clouds seen during training. 
+On the other hand, the model performs very well in segmenting chairs with distinct, well-separated components like a distinct back, seat, separable arm rests and discrete legs. Chairs that have intricate details or accessories that overlap multiple segments, like a pillow over the seat and back, trip up the model. In such cases, there is often bleeding between segments, with the model unable to constrain a larger segment from encroaching on adjacent smaller segments.
+
+
+Robustness Analysis
+===============================================================================
+
+Robustness against Rotation
+-------------------------------------------------------------------------------
+Rotate each evaluation point cloud around x-axis for 30, 60 and 90 degrees.
+I have written the code to loop over specific object indices and while looping over various thetas (angles).
+
+### Classification
+Run the code: 
+```bash
+python eval_cls_rotated.py
+```
+
+| Class | Ground Truth | 30 deg | 60 deg | 90 deg |
+|:-----:|:------------:|:------:|:------:|:------:|
+| Chair | ![Pred: Chair](25.gif) | ![Pred: Vase](26.gif) | ![Pred: Lamp](27.gif) | ![Pred: Chair](28.gif) |
+| Vase | ![Pred: Vase](29.gif) | ![Pred: Vase](30.gif) | ![Pred: Chair](31.gif) | ![Pred: Vase](32.gif) |
+| Lamp | ![Pred: Lamp](33.gif) | ![Pred: Lamp](34.gif) | ![Pred: Chair](35.gif) | ![Pred: Chair](36.gif) |
+| Test Accuracy | 0.9769 | 0.7992 | 0.2235 | 0.3012 |
+
+
+### Segmentation
+Run the code: 
+```bash
+python eval_seg_rotated.py
+```
+
+|  | 0 deg | 30 deg | 60 deg | 90 deg |
+|--|:------------:|:------:|:------:|:------:|
+|  | ![Acc: 0.9788](37.gif) | ![Acc: 0.9578](38.gif) | ![Acc: 0.4967](39.gif) | ![Acc: 0.2011](40.gif) |
+|  | ![Acc: 0.9058](41.gif) | ![Acc: 0.6519](42.gif) | ![Acc: 0.4211](43.gif) | ![Acc: 0.1904](44.gif) |
+|  | ![Acc: 0.5342](45.gif) | ![Acc: 0.5512](46.gif) | ![Acc: 0.3564](47.gif) | ![Acc: 0.1267](48.gif) |
+| Test Accuracy | 0.9022 | 0.7992 | 0.399 | 0.1319 |
+
+### Analysis
+
+The model struggles to make accurate predictions when the point cloud is rotated dramatically away from an upright orientation. This limitation is likely due to the lack of data augmentation during training to include non-upright point cloud configurations. Without exposure to rotated variants of the object classes, the model fails to generalize to point clouds that deviate hugely from the expected upright positioning seen in the training data. Incorporating point cloud rotations during training data generation would likely improve the model's ability to recognize and segment objects despite major shifts in orientation. By augmenting the data to simulate tilted, skewed or even completely inverted point clouds, the model could become invariant to orientation and handle such cases gracefully during prediction.
+
+ 
+Robustness against Number of Points
+-------------------------------------------------------------------------------
+Evaluate the model with varying number of sampled points.
+I have written the code to loop over specific object indices and while looping over various num_points.
+
+### Classification
+Run the code: 
+```bash
+python eval_cls_numpoints.py
+```
+
+| Class | 10 | 100 | 1000 | 10000 |
+|:-----:|:------------:|:------:|:------:|:------:|
+| Chair | ![Pred: Chair](49.gif) | ![Pred: Chair](50.gif) | ![Pred: Chair](51.gif) | ![Pred: Chair](52.gif) |
+| Vase | ![Pred: Lamp](53.gif) | ![Pred: Lamp](54.gif) | ![Pred: Vase](55.gif) | ![Pred: Vase](56.gif) |
+| Lamp | ![Pred: Lamp](57.gif) | ![Pred: Lamp](58.gif) | ![Pred: Lamp](59.gif) | ![Pred: Lamp](60.gif) |
+| Test Accuracy | 0.5012 | 0.8255 | 0.8992 | 0.9769 |
+
+
+### Segmentation
+Run the code: 
+```bash
+python eval_seg_numpoints.py
+```
+
+|  | 10 | 100 | 1000 | 10000 |
+|--|:------------:|:------:|:------:|:------:|
+|  | ![Acc: 0.4023](61.gif) | ![Acc: 0.8674](62.gif) | ![Acc: 0.9261](63.gif) | ![Acc: 0.9788](64.gif) |
+|  | ![Acc: 0.2876](65.gif) | ![Acc: 0.8232](66.gif) | ![Acc: 0.9199](67.gif) | ![Acc: 0.9265](68.gif) |
+|  | ![Acc: 0.4997](69.gif) | ![Acc: 0.7512](70.gif) | ![Acc: 0.7164](71.gif) | ![Acc: 0.5267](72.gif) |
+| Test Accuracy | 0.4673 | 0.7992 | 0.8599 | 0.9022 |
+
+### Analysis
+
+The model demonstrates considerable robustness to sparsity in the point cloud inputs. With as few as 10 points, it can achieve 25% test accuracy, rising rapidly to 80% accuracy with only 50 points. This suggests the model is able to infer the correct shape from even a very sparse sampling of points. However, its ability to generalize from such limited information may be challenged as the number of classes increases. Discriminating between more categories with fewer representative points could lower the accuracy, despite the architectural design choices to promote invariance to input sparsity. There may be a threshold minimum density below which the lack of key shape features impedes reliable classification, especially with additional object classes added. But with this 3 class dataset, the model's performance from merely 50 input points indicates surprising generalizability from scant point data. 
+
+
+<!-- Markdeep: --><style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace}</style><script src="markdeep.min.js" charset="utf-8"></script><script src="https://morgan3d.github.io/markdeep/latest/markdeep.min.js?" charset="utf-8"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
+

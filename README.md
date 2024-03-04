@@ -169,7 +169,7 @@ Evaluates the model with rotated inputs for the classification task by rendering
 |:-----:|:------------:|:------:|:------:|:------:|
 | Chair | ![Pred: Chair](report/25.gif) | ![Pred: Vase](report/26.gif) | ![Pred: Lamp](report/27.gif) | ![Pred: Chair](report/28.gif) |
 | Vase | ![Pred: Vase](report/29.gif) | ![Pred: Vase](report/30.gif) | ![Pred: Chair](report/31.gif) | ![Pred: Vase](report/32.gif) |
-| Lamp | ![Pred: Lamp](report/33.gif) | ![Pred: Lamp](report/34.gif) | ![Pred: Chair](report/35.gif) | ![Pred: Chair](36.gif) |
+| Lamp | ![Pred: Lamp](report/33.gif) | ![Pred: Lamp](report/34.gif) | ![Pred: Chair](report/35.gif) | ![Pred: Chair](report/36.gif) |
 | Test Accuracy | 0.9769 | 0.7992 | 0.2235 | 0.3012 |
 
 ### 3.1.2. Segmentation
@@ -181,9 +181,9 @@ Evaluates the model with rotated inputs for the segmentation task by rendering p
 
 |  | 0 deg | 30 deg | 60 deg | 90 deg |
 |--|:------------:|:------:|:------:|:------:|
-|  | ![Acc: 0.9788](report/37.gif) | ![Acc: 0.9578](report/38.gif) | ![Acc: 0.4967](report/39.gif) | ![Acc: 0.2011](40.gif) |
-|  | ![Acc: 0.9058](report/41.gif) | ![Acc: 0.6519](report/42.gif) | ![Acc: 0.4211](report/43.gif) | ![Acc: 0.1904](44.gif) |
-|  | ![Acc: 0.5342](report/45.gif) | ![Acc: 0.5512](report/46.gif) | ![Acc: 0.3564](report/47.gif) | ![Acc: 0.1267](48.gif) |
+|  | ![Acc: 0.9788](report/37.gif) | ![Acc: 0.9578](report/38.gif) | ![Acc: 0.4967](report/39.gif) | ![Acc: 0.2011](report/40.gif) |
+|  | ![Acc: 0.9058](report/41.gif) | ![Acc: 0.6519](report/42.gif) | ![Acc: 0.4211](report/43.gif) | ![Acc: 0.1904](report/44.gif) |
+|  | ![Acc: 0.5342](report/45.gif) | ![Acc: 0.5512](report/46.gif) | ![Acc: 0.3564](report/47.gif) | ![Acc: 0.1267](report/48.gif) |
 | Test Accuracy | 0.9022 | 0.7992 | 0.399 | 0.1319 |
 
 ### Analysis
